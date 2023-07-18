@@ -9,8 +9,8 @@ services:
     image: shop_backend
     container_name: shop_backend
     build:
-      context: ${BASE_DIR}/BEShopApp
-      dockerfile: ${BASE_DIR}/BEShopApp/Dockerfile
+      context: ${BASE_DIR}/
+      dockerfile: ${BASE_DIR}/Dockerfile
     restart: always
     environment:
       - uid=1000
@@ -19,14 +19,14 @@ services:
       - .env
     volumes:
       - ${BASE_DIR}/logs/shop:/var/log/shop
-      - ${BASE_DIR}/BEShopApp:/apps/shop
+      - ${BASE_DIR}/shop:/apps/shop
     ports:
       - 8000:8000
       - 8001:8001
       - 8002:8002
     networks:
       - shop
-#    command: bash -c "tail -f /dev/null"
+    command: bash -c "tail -f /dev/null"
 
   shop_psql_db:
     image: postgres:15-alpine

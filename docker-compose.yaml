@@ -1,0 +1,43 @@
+version: "3.8"
+networks:
+  shop:
+    name: shop
+    external: true
+
+services:
+  shop_backend:
+    image: shop_backend
+    container_name: shop_backend
+    build:
+      context: ${BASE_DIR}/BEShopApp
+      dockerfile: ${BASE_DIR}/BEShopApp/Dockerfile
+    restart: always
+    environment:
+      - uid=1000
+      - gid=1000
+    env_file:
+      - .env
+    volumes:
+      - ${BASE_DIR}/logs/shop:/var/log/shop
+      - ${BASE_DIR}/BEShopApp:/apps/shop
+    ports:
+      - 8000:8000
+      - 8001:8001
+      - 8002:8002
+    networks:
+      - shop
+#    command: bash -c "tail -f /dev/null"
+
+  shop_psql_db:
+    image: postgres:15-alpine
+    container_name: shop_psql_db
+    restart: always
+    environment:
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+    ports:
+      - '5433:5432'
+    volumes:
+      - ${BASE_DIR}/postgresql/data:/var/lib/postgresql/data
+    networks:
+      - shop

@@ -19,11 +19,13 @@ class DueFilter(django_filters.FilterSet):
     total_money__gte = filters.NumberFilter(
         field_name="total_money", lookup_expr="gte"
     )
+    phone__contains = filters.CharFilter(field_name="phone", lookup_expr="contains")
 
     class Meta:
         model = Due
         fields = (
             "total_money__exact",
             "total_money__lte",
-            "total_money__gte"
+            "total_money__gte",
+            "phone__contains",
         )

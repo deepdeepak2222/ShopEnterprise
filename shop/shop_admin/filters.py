@@ -20,6 +20,7 @@ class DueFilter(django_filters.FilterSet):
         field_name="total_money", lookup_expr="gte"
     )
     phone__contains = filters.CharFilter(field_name="phone", lookup_expr="contains")
+    paid = filters.BooleanFilter(lookup_expr="exact")
 
     class Meta:
         model = Due
@@ -28,4 +29,5 @@ class DueFilter(django_filters.FilterSet):
             "total_money__lte",
             "total_money__gte",
             "phone__contains",
+            "paid",
         )

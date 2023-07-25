@@ -4,10 +4,11 @@ from rest_framework import status
 from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 
-from core.constants import RESPONSE_KEY
+from core.constants import RESPONSE_KEY, ERROR
 from shop_admin.filters import DueFilter
 from shop_admin.models import Due
 from shop_admin.serializers import DueDetailSerializer, DueListSerializer
+from shop_admin.utils import make_due_payment
 
 
 # Create your views here.
@@ -18,7 +19,6 @@ class DueView(ListAPIView, CreateAPIView, UpdateAPIView):
     filter_backends = (filters.DjangoFilterBackend,)
 
     def get_queryset(self):
-        print("Came here")
         return Due.objects.all()
 
     def get_serializer_class(self):
@@ -26,12 +26,30 @@ class DueView(ListAPIView, CreateAPIView, UpdateAPIView):
             return DueDetailSerializer
         return DueListSerializer
 
+    def get(self, request, *args, **kwargs):
+        msg = ERROR
+        try:
+            due_id = request.query_params.get("id")
+            if due_id:
+                due = Due.objects.get(pk=due_id)
+                serializer = DueDetailSerializer(due)
+                return Response(serializer.data)
+            qs = self.get_queryset()
+            qs = self.filter_queryset(qs)
+            serializer = DueDetailSerializer(qs, many=True)
+            return Response(serializer.data)
+        except Due.DoesNotExist:
+            msg = "Due does not exist for id: %s" % due_id
+        except Exception as e:
+            print(str(e))
+        return Response({RESPONSE_KEY: msg}, status=status.HTTP_400_BAD_REQUEST)
+
     def put(self, request, *args, **kwargs):
         """
         Update due
         """
         data = request.data
-        msg = "Error Occurred"
+        msg = ERROR
         try:
             if not data.get("due_detail"):
                 raise serializers.ValidationError({"due_detail": "Due detail is not provided."})
@@ -48,4 +66,26 @@ class DueView(ListAPIView, CreateAPIView, UpdateAPIView):
             print(msg)
         except Exception as e:
             print("Error occurred while updating the due(%s): %s" % (data.get("id"), str(e)))
+        return Response({RESPONSE_KEY: msg}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DuePaymentView(CreateAPIView):
+    def post(self, request, *args, **kwargs):
+        msg = ERROR
+        due_id = None
+        try:
+            data = request.data
+            due_id = data.get("id")
+            due = Due.objects.get(pk=due_id)
+            payment_detail = data.get("payment_detail")
+            make_due_payment(due, payment_detail)
+            serializer = DueDetailSerializer(due)
+            return Response(serializer.data)
+        except Due.DoesNotExist:
+            msg = "Due does not exist for given id : %s" % due_id
+        except serializers.ValidationError as e:
+            print(str(e))
+            msg = e.detail
+        except Exception as e:
+            print(str(e))
         return Response({RESPONSE_KEY: msg}, status=status.HTTP_400_BAD_REQUEST)

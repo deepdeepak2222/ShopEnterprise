@@ -4,16 +4,44 @@ Serializer classes for shop admin module
 from rest_framework import serializers
 
 from core.utils import date_time_from_timestamp
-from shop_admin.models import Due, DueDetail
+from shop_admin.models import Due, DueDetail, DuePayment
+
+
+class PaymentHistorySerializer(serializers.ModelSerializer):
+    """
+    Payment history serializer
+    """
+    pay_date = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = DuePayment
+        fields = (
+            "id",
+            "due",
+            "pay_date",
+            "total_money",
+            "payment_detail",
+        )
+
+    @staticmethod
+    def get_pay_date(obj):
+        """
+        Get pay date
+        """
+        return int(obj.pay_date.timestamp())
 
 
 class DueHistorySerializer(serializers.ModelSerializer):
+    """
+    Due history serializer
+    """
     due_date = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = DueDetail
         fields = (
             "id",
+            "due",
             "due_date",
             "total_money",
             "due_detail",
@@ -29,6 +57,7 @@ class DueHistorySerializer(serializers.ModelSerializer):
 
 class DueDetailSerializer(serializers.ModelSerializer):
     due_history = DueHistorySerializer(read_only=True, many=True)
+    payment_history = PaymentHistorySerializer(read_only=True, many=True)
 
     class Meta:
         model = Due

@@ -5,6 +5,7 @@ from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 
 from core.constants import RESPONSE_KEY, ERROR
+from core.pagination import StandardResultsSetPagination
 from shop_admin.filters import DueFilter
 from shop_admin.models import Due
 from shop_admin.serializers import DueDetailSerializer, DueListSerializer
@@ -17,9 +18,11 @@ class DueView(ListAPIView, CreateAPIView, UpdateAPIView):
     model_class = Due
     filterset_class = DueFilter
     filter_backends = (filters.DjangoFilterBackend,)
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-        return Due.objects.all()
+        return Due.objects.all().prefetch_related("payment_history", "due_history"). \
+            order_by("-modified")
 
     def get_serializer_class(self):
         if self.request.query_params.get("id") or self.request.method in ("POST", "PUT"):
@@ -36,8 +39,10 @@ class DueView(ListAPIView, CreateAPIView, UpdateAPIView):
                 return Response(serializer.data)
             qs = self.get_queryset()
             qs = self.filter_queryset(qs)
-            serializer = DueDetailSerializer(qs, many=True)
-            return Response(serializer.data)
+            # get paginated response
+            result_page = self.paginator.paginate_queryset(qs, request)
+            serializer = DueDetailSerializer(result_page, many=True)
+            return self.paginator.get_paginated_response(serializer.data)
         except Due.DoesNotExist:
             msg = "Due does not exist for id: %s" % due_id
         except Exception as e:

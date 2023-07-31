@@ -9,6 +9,7 @@ from shop_admin.models import DuePayment
 
 def make_due_payment(due, payment_detail):
     """
+    Make due payment.
     "payment_detail": {
             "payment_date": 1690172976,
             "payment_detail": "Bought a pen",

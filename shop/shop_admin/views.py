@@ -41,7 +41,7 @@ class DueView(ListAPIView, CreateAPIView, UpdateAPIView):
             qs = self.filter_queryset(qs)
             # get paginated response
             result_page = self.paginator.paginate_queryset(qs, request)
-            serializer = DueDetailSerializer(result_page, many=True)
+            serializer = DueListSerializer(result_page, many=True)
             return self.paginator.get_paginated_response(serializer.data)
         except Due.DoesNotExist:
             msg = "Due does not exist for id: %s" % due_id

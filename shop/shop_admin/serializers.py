@@ -58,18 +58,24 @@ class DueHistorySerializer(serializers.ModelSerializer):
 class DueDetailSerializer(serializers.ModelSerializer):
     due_history = DueHistorySerializer(read_only=True, many=True)
     payment_history = PaymentHistorySerializer(read_only=True, many=True)
+    full_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Due
         fields = (
             "id", "f_name", "l_name", "phone", "total_money",
-            "remaining_money", "payment_history", "paid", "due_history"
+            "remaining_money", "payment_history", "paid", "due_history",
+            "full_name"
         )
         read_only_fields = (
             "remaining_money", "payment_history",
             "id", "paid", "total_money",
-            "due_history"
+            "due_history", "full_name"
         )
+
+    @staticmethod
+    def get_full_name(obj):
+        return "%s %s" % (obj.f_name, obj.l_name)
 
     def validate(self, attrs):
         if not self.initial_data.get("due_detail"):
@@ -121,5 +127,5 @@ class DueDetailSerializer(serializers.ModelSerializer):
 class DueListSerializer(DueDetailSerializer):
     class Meta:
         model = Due
-        fields = ("id", "f_name", "l_name", "phone", "total_money", "remaining_money")
-        read_only_fields = ("remaining_money", "payment_history", "id")
+        fields = ("id", "phone", "total_money", "remaining_money", "full_name")
+        read_only_fields = ("remaining_money", "payment_history", "id", "full_name")

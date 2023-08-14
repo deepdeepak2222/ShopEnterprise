@@ -28,7 +28,7 @@ class PaymentHistorySerializer(serializers.ModelSerializer):
         """
         Get pay date
         """
-        return int(obj.pay_date.timestamp())
+        return int(obj.pay_date.timestamp() * 1000)
 
 
 class DueHistorySerializer(serializers.ModelSerializer):
@@ -52,7 +52,7 @@ class DueHistorySerializer(serializers.ModelSerializer):
         """
         Get due date
         """
-        return int(obj.due_date.timestamp())
+        return int(obj.due_date.timestamp() * 1000)
 
 
 class DueDetailSerializer(serializers.ModelSerializer):

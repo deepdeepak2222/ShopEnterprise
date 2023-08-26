@@ -3,8 +3,9 @@ Utilities for shop admin module
 """
 from rest_framework import serializers
 
+from core.constants import TransactionType
 from core.utils import date_time_from_timestamp
-from shop_admin.models import DuePayment
+from shop_admin.models import TransactionDetail
 
 
 def make_due_payment(due, payment_detail):
@@ -26,11 +27,12 @@ def make_due_payment(due, payment_detail):
         raise serializers.ValidationError({"payment_detail": "Excessive payment."})
     payment_data = {
         "due": due,
-        "pay_date": date_time_from_timestamp(payment_detail.get("payment_date")),
+        "transaction_date": date_time_from_timestamp(payment_detail.get("payment_date")),
         "total_money": payment_detail.get("total_money"),
-        "payment_detail": payment_detail.get("payment_detail"),
+        "transaction_detail": payment_detail.get("payment_detail"),
+        "transaction_type": TransactionType.DEPOSIT,
     }
-    payment = DuePayment.objects.create(**payment_data)
-    due.payment_history.add(payment)
+    payment = TransactionDetail.objects.create(**payment_data)
+    due.transaction_history.add(payment)
     due.total_money = due.total_money - payment_detail.get("total_money")
     due.save()

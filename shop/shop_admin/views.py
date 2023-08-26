@@ -21,8 +21,7 @@ class DueView(ListAPIView, CreateAPIView, UpdateAPIView):
     pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-        return Due.objects.all().prefetch_related("payment_history", "due_history"). \
-            order_by("-modified")
+        return Due.objects.all().order_by("-modified")
 
     def get_serializer_class(self):
         if self.request.query_params.get("id") or self.request.method in ("POST", "PUT"):

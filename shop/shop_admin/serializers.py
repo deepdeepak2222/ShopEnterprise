@@ -3,74 +3,25 @@ Serializer classes for shop admin module
 """
 from rest_framework import serializers
 
+from core.constants import TransactionType
 from core.utils import date_time_from_timestamp
-from shop_admin.models import Due, DueDetail, DuePayment
-
-
-class PaymentHistorySerializer(serializers.ModelSerializer):
-    """
-    Payment history serializer
-    """
-    pay_date = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = DuePayment
-        fields = (
-            "id",
-            "due",
-            "pay_date",
-            "total_money",
-            "payment_detail",
-        )
-
-    @staticmethod
-    def get_pay_date(obj):
-        """
-        Get pay date
-        """
-        return int(obj.pay_date.timestamp() * 1000)
-
-
-class DueHistorySerializer(serializers.ModelSerializer):
-    """
-    Due history serializer
-    """
-    due_date = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = DueDetail
-        fields = (
-            "id",
-            "due",
-            "due_date",
-            "total_money",
-            "due_detail",
-        )
-
-    @staticmethod
-    def get_due_date(obj):
-        """
-        Get due date
-        """
-        return int(obj.due_date.timestamp() * 1000)
+from shop_admin.models import Due, TransactionDetail
 
 
 class DueDetailSerializer(serializers.ModelSerializer):
-    due_history = DueHistorySerializer(read_only=True, many=True)
-    payment_history = PaymentHistorySerializer(read_only=True, many=True)
+    transaction_history = serializers.SerializerMethodField(read_only=True)
     full_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Due
         fields = (
             "id", "f_name", "l_name", "phone", "total_money",
-            "remaining_money", "payment_history", "paid", "due_history",
-            "full_name"
+            "remaining_money", "paid",
+            "full_name", "transaction_history"
         )
         read_only_fields = (
-            "remaining_money", "payment_history",
-            "id", "paid", "total_money",
-            "due_history", "full_name"
+            "remaining_money", "id", "paid",
+            "total_money", "full_name", "transaction_history"
         )
 
     @staticmethod
@@ -114,18 +65,37 @@ class DueDetailSerializer(serializers.ModelSerializer):
         """
         history = {
             "due": due,
-            "due_date": date_time_from_timestamp(due_detail.get("due_date")),
+            "transaction_date": date_time_from_timestamp(due_detail.get("due_date")),
             "total_money": due_detail.get("total_money"),
-            "due_detail": due_detail.get("due_detail"),
+            "transaction_detail": due_detail.get("due_detail"),
+            "transaction_type": TransactionType.BORROW,
         }
-        due_history_obj = DueDetail.objects.create(**history)
+        due_history_obj = TransactionDetail.objects.create(**history)
         due.total_money = due.total_money + history.get("total_money")
         due.save(update_fields=["total_money"])
-        due.due_history.add(due_history_obj)
+        due.transaction_history.add(due_history_obj)
+
+    @staticmethod
+    def get_transaction_history(obj):
+        """
+        Get transaction history
+        """
+        transactions = TransactionDetail.objects.filter(due=obj).order_by("-transaction_date")
+        transactions_history = []
+        for trans in transactions:
+            transactions_history.append(
+                {
+                    "transaction_date": int(trans.transaction_date.timestamp()*1000),
+                    "total_money": trans.total_money,
+                    "transaction_detail": trans.transaction_detail,
+                    "transaction_type": trans.transaction_type,
+                }
+            )
+        return transactions_history
 
 
 class DueListSerializer(DueDetailSerializer):
     class Meta:
         model = Due
         fields = ("id", "phone", "total_money", "remaining_money", "full_name")
-        read_only_fields = ("remaining_money", "payment_history", "id", "full_name")
+        read_only_fields = ("remaining_money", "id", "full_name")

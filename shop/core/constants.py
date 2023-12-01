@@ -3,7 +3,8 @@ Common Constants
 """
 RESPONSE_KEY = "detail"
 
-ERROR = "Error Occurred"
+ERROR = "An unexpected error occurred while processing your request"
+DELETED = "Deleted Successfully."
 
 
 class TransactionType:

@@ -1,35 +1,30 @@
+import uuid
+
 from django.db import models
 
+from category.constants import CategoryType
+from category.models import CustomCategory
 from core.model_utils import TimestampedModel
-from shop_inventory.enums import PriceType
 
-
-class ShopItemCategory(TimestampedModel):
-    """
-    Item category. Example: Biscuit, Grocery, Cosmetic, Liquid Food etc
-    """
-    label = models.CharField(max_length=100, unique=True)
-
-
-# Create your models here.
 
 class ShopItem(TimestampedModel):
     """
     Item and its details
     """
-    PRICE_TYPE_CHOICES = (
-        (PriceType.L, PriceType.L),
-        (PriceType.KG, PriceType.KG),
-        (PriceType.QUANT, PriceType.QUANT),
+    CAT_TYPE_CHOICES = (
+        (CategoryType.PER_KG, CategoryType.PER_KG),
+        (CategoryType.PER_LTR, CategoryType.PER_LTR),
+        (CategoryType.PER_PIECE, CategoryType.PER_PIECE),
     )
-    barcode = models.CharField(max_length=50)
-    detail = models.CharField(max_length=500)
+
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    barcode = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=200)
+    description = models.CharField(max_length=500, null=True, blank=True)
+    total = models.FloatField(default=0)
     category = models.ForeignKey(
-        ShopItemCategory, on_delete=models.SET_NULL,
-        related_name="category_items", null=True
+        CustomCategory, on_delete=models.SET_NULL,
+        related_name="cust_category_items", null=True
     )
-    price_type = models.CharField(
-        max_length=10, choices=PRICE_TYPE_CHOICES,
-        default=PriceType.QUANT
-    )
+    category_type = models.CharField(max_length=15, choices=CAT_TYPE_CHOICES)
     price = models.FloatField()

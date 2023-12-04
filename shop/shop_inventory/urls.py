@@ -1,10 +1,9 @@
 from django.urls import path
 
-from shop_admin.views import DueView, DuePaymentView
+from shop_inventory.views import ShopItemView
 
 # from django.urls
 
 urlpatterns = [
-    # path("add/", ItemView.as_view()),
-    # path("due/payment/", DuePaymentView.as_view()),
+    path("", ShopItemView.as_view()),
 ]

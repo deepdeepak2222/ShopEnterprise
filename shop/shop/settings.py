@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'core',
     'shop_admin',
     'category',
+    'shop_inventory',
 ]
 
 MIDDLEWARE = [

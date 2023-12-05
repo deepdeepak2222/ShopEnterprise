@@ -38,3 +38,10 @@ class ShopItemSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return ShopItem.objects.create(**validated_data)
 
+    def update(self, instance, validated_data):
+        for field, val in validated_data.items():
+            setattr(instance, field, val)
+        instance.save()
+        return instance
+
+

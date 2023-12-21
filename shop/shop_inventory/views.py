@@ -30,6 +30,8 @@ class ShopItemView(GenericAPIView):
     def get_queryset(self):
         if self.request.query_params.get("q"):
             qs = ShopItem.objects.raw(SHOP_ITEM_TSV_SEARCH_Q % self.request.query_params.get("q"))
+            id_list = [q.id for q in qs]
+            qs = ShopItem.objects.filter(pk__in=id_list).order_by("-created")
         else:
             qs = ShopItem.objects.all().order_by("-created")
         return qs

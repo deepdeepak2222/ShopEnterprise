@@ -8,29 +8,19 @@ ERRORS = {
 
 
 class FilterTypes:
+    """
+    If filter_type in [FLOAT_RANGE, INT_RANGE]:
+        qp_key will be list of keys
+            Example:
+                [total_from, total_to]
+
+    """
     SINGLE_SEL = "single-select"
     FLOAT_RANGE = "float-range"
+    INT_RANGE = "int-range"
+    SEARCH = "text-search"
 
 
 class OptionTypes:
     URL = "url"
-
-
-FILTER_COMPS = {
-    "shop-item": [
-        {
-            "label": "Categories",  # This is what the filter will appear as in UI
-            "qp_key": "category",  # Query parameter key
-            "filter_type": FilterTypes.SINGLE_SEL,
-            "get_options": OptionTypes.URL,
-            "options": "/filters/shop-item/category/",
-        },
-        {
-            "label": "Category Types",  # This is what the filter will appear as in UI
-            "qp_key": "category_type",  # Query parameter key
-            "filter_type": FilterTypes.SINGLE_SEL,
-            "get_options": OptionTypes.URL,
-            "options": "/filters/shop-item/category-type/",
-        },
-    ]
-}
+    STATIC_RANGE = "static-range"

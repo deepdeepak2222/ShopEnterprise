@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'shop_admin',
     'category',
     'shop_inventory',
+    'shop_filters',
 ]
 
 MIDDLEWARE = [

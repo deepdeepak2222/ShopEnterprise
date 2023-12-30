@@ -1,8 +1,11 @@
-from shop_filters.constants import FilterTypes, OptionTypes
+from shop_filters.constants import FilterTypes, OptionTypes, SEARCH_COMPONENT
 from shop_filters.shop_items_filter_options import get_shop_item_total_range, get_shop_item_price_range
 
 
 def get_shop_items_filter_components():
+    """
+    Get filter components for shop-item module
+    """
     return [
         {
             "label": "Categories",  # This is what the filter will appear as in UI
@@ -32,9 +35,5 @@ def get_shop_items_filter_components():
             "get_options": OptionTypes.STATIC_RANGE,
             "options": get_shop_item_price_range(),
         },
-        {
-            "label": "Search",  # This is what the filter will appear as in UI
-            "qp_key": "q",  # Query parameter keys
-            "filter_type": FilterTypes.SEARCH,
-        }
+        SEARCH_COMPONENT
     ]

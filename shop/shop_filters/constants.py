@@ -24,3 +24,10 @@ class FilterTypes:
 class OptionTypes:
     URL = "url"
     STATIC_RANGE = "static-range"
+
+
+SEARCH_COMPONENT = {
+    "label": "Search",  # This is what the filter will appear as in UI
+    "qp_key": "q",  # Query parameter keys
+    "filter_type": FilterTypes.SEARCH,
+}

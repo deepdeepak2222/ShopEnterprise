@@ -20,7 +20,6 @@ class CustomCategoryFilter(django_filters.FilterSet):
 
     @staticmethod
     def search_custom_category(qs, name, value):
-        print(f"qs:{qs}, name: {name}, value: {value}")
         fil_exp = Q(name__icontains=value) | \
                   Q(category_type__icontains=value) | \
                   Q(description__icontains=value)

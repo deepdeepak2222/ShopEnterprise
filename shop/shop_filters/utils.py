@@ -8,6 +8,12 @@ filter_option_functions = {
     "shop-item": {
         "category": get_shop_items_categories,
         "category-type": get_shop_items_category_types,
+    },
+    "custom-category": {
+        "category-type": get_shop_items_category_types,
+    },
+    "due": {
+
     }
 }
 

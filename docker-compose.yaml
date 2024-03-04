@@ -26,7 +26,7 @@ services:
       - 8002:8002
     networks:
       - shop
-    command: bash -c "pip install -r requirements.txt && python manage.py migrate && python manage.py runserver 0:8001"
+    command: bash -c "pip install -r requirements.txt && python manage.py migrate && python manage.py runserver 0:8000"
 
   shop_psql_db:
     image: postgres:15-alpine
@@ -41,3 +41,28 @@ services:
       - ${BASE_DIR}/postgresql/data:/var/lib/postgresql/data
     networks:
       - shop
+
+  nginx:
+    depends_on:
+      - shop_fe
+    container_name: shop_nginx
+    image: nginx:latest
+    restart: always
+    networks:
+      - shop
+    ports:
+      - 80:80
+    volumes:
+      - ${BASE_DIR}/nginx.conf:/etc/nginx/conf.d/default.conf
+
+  shop_fe:
+    image: deepdeepak2222/shopfe
+    container_name: shop_fe
+    restart: always
+    ports:
+      - 5032:5032
+      - 5031:5031
+    networks:
+      - shop
+    command: bash -c "npm run preview -- --host"
+

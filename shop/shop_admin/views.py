@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from core.constants import RESPONSE_KEY, ERROR
 from core.pagination import StandardResultsSetPagination
+from core.utils import get_sort_key
 from shop_admin.filters import DueFilter
 from shop_admin.models import Due
 from shop_admin.serializers import DueDetailSerializer, DueListSerializer
@@ -19,9 +20,13 @@ class DueView(ListAPIView, CreateAPIView, UpdateAPIView):
     filterset_class = DueFilter
     filter_backends = (filters.DjangoFilterBackend,)
     pagination_class = StandardResultsSetPagination
+    sort_keys = ("modified", "created", "f_name", "l_name", "phone", "total_money")
+    default_sort = "-modified"
 
     def get_queryset(self):
-        return Due.objects.all().order_by("-modified")
+        sort = self.request.query_params.get("sort", "-modified")
+        sort = get_sort_key(sort, self.default_sort, self.sort_keys)
+        return Due.objects.all().order_by(sort)
 
     def get_serializer_class(self):
         if self.request.query_params.get("id") or self.request.method in ("POST", "PUT"):

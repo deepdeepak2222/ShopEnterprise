@@ -26,7 +26,7 @@ services:
       - 8002:8002
     networks:
       - shop
-    command: bash -c "pip install -r requirements.txt && python manage.py migrate && python manage.py runserver 0:8000"
+    command: bash -c "pip install --default-timeout=100 -r requirements.txt && python manage.py migrate_schemas --shared && python manage.py runserver 0:8000"
 
   shop_psql_db:
     image: postgres:15-alpine
@@ -64,5 +64,5 @@ services:
       - 5031:5031
     networks:
       - shop
-    command: bash -c "npm run preview -- --host"
+    command: bash -c "npm run preview -- --host --port 80"
 

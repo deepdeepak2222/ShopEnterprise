@@ -34,7 +34,9 @@ def get_shop_item_total_range():
     Get shop item's total property's range (so far in db)
     """
     max_min = ShopItem.objects.aggregate(max=Max('total'), min=Min('total'))
-    return [int(max_min["min"]), int(max_min["max"])]
+    min_item = int(max_min.get("min", 0)) if max_min.get("min", 0) else 0
+    max_item = int(max_min.get("max", 0)) if max_min.get("max", 0) else 0
+    return [min_item, max_item]
 
 
 def get_shop_item_price_range():
@@ -42,4 +44,6 @@ def get_shop_item_price_range():
     Get shop item's price property's range (so far in db)
     """
     max_min = ShopItem.objects.aggregate(max=Max('price'), min=Min('price'))
-    return [int(max_min["min"]), int(max_min["max"])]
+    min_item = int(max_min.get("min", 0)) if max_min.get("min", 0) else 0
+    max_item = int(max_min.get("max", 0)) if max_min.get("max", 0) else 0
+    return [min_item, max_item]

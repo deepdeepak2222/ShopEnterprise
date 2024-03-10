@@ -11,4 +11,6 @@ def get_total_due_range():
     Get total individual due's range(maximum and minimum borrowed amount)
     """
     max_min = Due.objects.aggregate(max=Max('total_money'), min=Min('total_money'))
-    return [int(max_min["min"]), int(max_min["max"])]
+    min_item = int(max_min.get("min", 0)) if max_min.get("min", 0) else 0
+    max_item = int(max_min.get("max", 0)) if max_min.get("max", 0) else 0
+    return [min_item, max_item]

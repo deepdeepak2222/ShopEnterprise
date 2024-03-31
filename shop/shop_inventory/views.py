@@ -12,6 +12,7 @@ from shop_inventory.filters import ShopItemFilter
 from shop_inventory.models import ShopItem
 from shop_inventory.serializers import ShopItemSerializer
 from django_filters import rest_framework as filters
+from rest_framework.permissions import IsAuthenticated
 
 
 # Create your views here.
@@ -22,6 +23,7 @@ class ShopItemView(GenericAPIView):
     API Type : POST/PUT/LIST/GET
     API: List/Create/Update/GET shop items
     """
+    permission_classes = (IsAuthenticated,)
     serializer_class = ShopItemSerializer
     pagination_class = StandardResultsSetPagination
     filterset_class = ShopItemFilter
@@ -100,6 +102,8 @@ class ShopItemView(GenericAPIView):
 
 
 class ShopItemRemoveView(UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     def put(self, request, *args, **kwargs):
         """
         Delete items from shop inventory

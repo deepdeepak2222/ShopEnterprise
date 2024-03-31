@@ -10,9 +10,11 @@ from category.models import CustomCategory
 from category.serializers import CustomCategorySerializer
 from core.constants import RESPONSE_KEY, ERROR, DELETED
 from log.log import log_info, log_err
+from rest_framework.permissions import IsAuthenticated
 
 
 class CategoryTypeView(ListAPIView):
+    permission_classes = (IsAuthenticated,)
     """
     List basic category types
     """
@@ -25,6 +27,7 @@ class CustomCategoryView(GenericAPIView):
     """
     API to CREATE/UPDATE/LIST/GET custom sub categories
     """
+    permission_classes = (IsAuthenticated,)
     serializer_class = CustomCategorySerializer
     filterset_class = CustomCategoryFilter
     filter_backends = (filters.DjangoFilterBackend,)

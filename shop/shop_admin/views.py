@@ -11,11 +11,11 @@ from shop_admin.filters import DueFilter
 from shop_admin.models import Due
 from shop_admin.serializers import DueDetailSerializer, DueListSerializer
 from shop_admin.utils import make_due_payment
+from rest_framework.permissions import IsAuthenticated
 
-
-# Create your views here.
 
 class DueView(ListAPIView, CreateAPIView, UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
     model_class = Due
     filterset_class = DueFilter
     filter_backends = (filters.DjangoFilterBackend,)
@@ -79,6 +79,8 @@ class DueView(ListAPIView, CreateAPIView, UpdateAPIView):
 
 
 class DuePaymentView(CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, *args, **kwargs):
         msg = ERROR
         due_id = None

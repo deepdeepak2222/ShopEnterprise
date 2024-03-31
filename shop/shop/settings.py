@@ -43,12 +43,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     'core',
     'shop_admin',
     'category',
     'shop_inventory',
     'shop_filters',
+    'rest_auth',
 ]
 
 MIDDLEWARE = [
@@ -140,7 +142,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'core.pagination.StandardResultsSetPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSIONS_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
 }
 
 DATABASE_ROUTERS = (
@@ -166,15 +174,16 @@ TENANT_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     'core',
     'shop_admin',
     'category',
     'shop_inventory',
     'shop_filters',
+    'rest_auth',
 )
 
 TENANT_MODEL = "customers.Client"  # app.Model
 DEFAULT_FILE_STORAGE = 'tenant_schemas.storage.TenantFileSystemStorage'
-PG_EXTRA_SEARCH_PATHS = ['extensions']
-PUBLIC_SCHEMA_NAME = "public"
+AUTH_USER_MODEL = "rest_auth.AdminUser"

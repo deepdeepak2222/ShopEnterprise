@@ -12,6 +12,8 @@ services:
       context: ${BASE_DIR}/
       dockerfile: ${BASE_DIR}/Dockerfile
     restart: always
+    depends_on:
+      - shop_psql_db
     environment:
       - uid=1000
       - gid=1000
@@ -26,7 +28,7 @@ services:
       - 8002:8002
     networks:
       - shop
-    command: bash -c "pip install --default-timeout=100 -r requirements.txt && python manage.py migrate_schemas --shared && python manage.py migrate_schemas && python manage.py runserver 0:8000"
+    command: bash -c "pip install --default-timeout=100 -r requirements.txt && sleep 10 && python manage.py migrate_schemas --shared && python manage.py migrate_schemas && python manage.py runserver 0:8000"
 
   shop_psql_db:
     image: postgres:15-alpine
@@ -35,6 +37,7 @@ services:
     environment:
       - POSTGRES_USER=${DATABASE_USER}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
     ports:
       - '5433:5432'
     volumes:

@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-9fym=3ucp*20chx9@_nvi&mq&y3oxp%7a=7x2-ixckcv+m3cel
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", False)
 
-ALLOWED_HOSTS = [".localhost"]  # This has to be changed when deployed with domain
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", ".localhost").split(",")
 
 CORS_ALLOWED_ORIGINS = []
 

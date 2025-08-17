@@ -38,4 +38,4 @@ def create_real_tenant(tenant_name, tenant_code, admin_email, admin_phone, passw
 
 
 # create_public_tenant()
-create_real_tenant("dt1", "dt1", "deepdeepak2222+1@gmail.com", "8817648997", "password")
+create_real_tenant("dt1", "dt1", "deepdeepak2222@gmail.com", "8817648997", "password")

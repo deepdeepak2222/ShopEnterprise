@@ -235,7 +235,7 @@ AUTH_USER_MODEL = "rest_auth.AdminUser"
 
 # Logging Configuration - Conditional based on DEBUG mode
 if DEBUG:
-    # Development logging (verbose)
+    # Development logging (console only to avoid file permission issues)
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -254,26 +254,21 @@ if DEBUG:
                 'class': 'logging.StreamHandler',
                 'formatter': 'verbose',
             },
-            'file': {
-                'class': 'logging.FileHandler',
-                'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
-                'formatter': 'verbose',
-            },
         },
         'root': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'DEBUG',
         },
         'loggers': {
             'django': {
-                'handlers': ['console', 'file'],
+                'handlers': ['console'],
                 'level': 'INFO',
                 'propagate': False,
             },
         },
     }
 else:
-    # Production logging (less verbose, errors only)
+    # Production logging (console only to avoid file permission issues)
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -284,19 +279,18 @@ else:
             },
         },
         'handlers': {
-            'file': {
-                'class': 'logging.FileHandler',
-                'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
+            'console': {
+                'class': 'logging.StreamHandler',
                 'formatter': 'verbose',
             },
         },
         'root': {
-            'handlers': ['file'],
+            'handlers': ['console'],
             'level': 'ERROR',
         },
         'loggers': {
             'django': {
-                'handlers': ['file'],
+                'handlers': ['console'],
                 'level': 'ERROR',
                 'propagate': False,
             },

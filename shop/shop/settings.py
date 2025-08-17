@@ -19,17 +19,62 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-9fym=3ucp*20chx9@_nvi&mq&y3oxp%7a=7x2-ixckcv+m3cel'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-9fym=3ucp*20chx9@_nvi&mq&y3oxp%7a=7x2-ixckcv+m3cel')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", False)
+DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", ".localhost").split(",")
 
-CORS_ALLOWED_ORIGINS = []
+# CORS Configuration - Conditional based on DEBUG mode
+if DEBUG:
+    # Development CORS settings
+    CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS_DEV", "http://localhost:5031,http://127.0.0.1:5031,http://dt1.localhost:5031").split(",")
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ALLOW_ALL_HEADERS = True
+    CORS_ALLOW_METHODS = [
+        'DELETE',
+        'GET',
+        'OPTIONS',
+        'PATCH',
+        'POST',
+        'PUT',
+    ]
+else:
+    # Production CORS settings
+    CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS_PROD", "https://your-domain.com").split(",")
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ALLOW_ALL_HEADERS = False
+    CORS_ALLOW_METHODS = [
+        'GET',
+        'POST',
+        'PUT',
+        'DELETE',
+    ]
 
-# CORS_ALLOW_ALL_ORIGINS = True # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
-CORS_ALLOW_CREDENTIALS = True
+# Security Settings - Conditional based on DEBUG mode
+if DEBUG:
+    # Development security settings (less restrictive)
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_BROWSER_XSS_FILTER = False
+    SECURE_CONTENT_TYPE_NOSNIFF = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+else:
+    # Production security settings (more restrictive)
+    SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "True").lower() == "true"
+    SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "True").lower() == "true"
+    CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", "True").lower() == "true"
+    SECURE_BROWSER_XSS_FILTER = os.environ.get("SECURE_BROWSER_XSS_FILTER", "True").lower() == "true"
+    SECURE_CONTENT_TYPE_NOSNIFF = os.environ.get("SECURE_CONTENT_TYPE_NOSNIFF", "True").lower() == "true"
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 # Application definition
 
@@ -187,3 +232,73 @@ TENANT_APPS = (
 TENANT_MODEL = "customers.Client"  # app.Model
 DEFAULT_FILE_STORAGE = 'tenant_schemas.storage.TenantFileSystemStorage'
 AUTH_USER_MODEL = "rest_auth.AdminUser"
+
+# Logging Configuration - Conditional based on DEBUG mode
+if DEBUG:
+    # Development logging (verbose)
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+                'style': '{',
+            },
+            'simple': {
+                'format': '{levelname} {message}',
+                'style': '{',
+            },
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'verbose',
+            },
+            'file': {
+                'class': 'logging.FileHandler',
+                'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
+                'formatter': 'verbose',
+            },
+        },
+        'root': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+        },
+    }
+else:
+    # Production logging (less verbose, errors only)
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+                'style': '{',
+            },
+        },
+        'handlers': {
+            'file': {
+                'class': 'logging.FileHandler',
+                'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
+                'formatter': 'verbose',
+            },
+        },
+        'root': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'ERROR',
+                'propagate': False,
+            },
+        },
+    }

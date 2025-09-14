@@ -209,6 +209,7 @@ SHARED_APPS = (
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'core',  # Health check endpoint should be shared
 )
 
 TENANT_APPS = (

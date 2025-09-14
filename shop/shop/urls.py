@@ -17,6 +17,7 @@ Including another URLconf
 from django.urls import path, include
 
 urlpatterns = [
+    path('health/', include("core.urls")),  # Health check endpoint (bypasses tenant middleware)
     path('shop/', include("shop_admin.urls")),
     path('rest-auth/', include("rest_auth.urls")),
     path('shop-item/', include("shop_inventory.urls")),
